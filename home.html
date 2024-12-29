@@ -15,10 +15,11 @@
 
     body {
       display: flex;
-      height: 100vh;
+      flex-direction: column;
+      min-height: 100vh;
       background: linear-gradient(to right top, red, rgb(237, 104, 3));
       color: white;
-      flex-direction: column;
+      font-size: 1rem; /* Default font size for readability */
     }
 
     /* Header Section */
@@ -107,15 +108,77 @@
       left: 0;
     }
 
+    /* Footer */
     footer {
       text-align: center;
       padding: 10px;
       background-color: rgb(237, 104, 3);
       color: white;
     }
-    img{
+
+    img {
       width: 100px;
       height: 100px;
+    }
+
+    /* Media Queries for Mobile Responsiveness */
+    @media screen and (max-width: 768px) {
+      /* Adjust the header layout */
+      header {
+        flex-direction: column;
+        text-align: center;
+        font-size: 2rem;
+      }
+
+      /* Adjust menu button and header */
+      .menu-btn {
+        font-size: 25px;
+        top: 10px;
+        left: 10px;
+      }
+
+      /* Adjust balance section */
+      .balance {
+        font-size: 1.2em;
+      }
+
+      /* Adjust menu width for mobile */
+      .menu {
+        width: 200px;
+      }
+
+      /* Adjust main content font size */
+      .main-content {
+        padding: 10px;
+        font-size: 1.2em;
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      /* Header text size */
+      header {
+        font-size: 1.8em;
+      }
+
+      /* Adjust main content font size */
+      .main-content {
+        font-size: 1.1em;
+      }
+
+      /* Reduce padding */
+      .main-content {
+        padding: 10px;
+      }
+
+      /* Reduce font size in menu */
+      .menu a {
+        font-size: 1.2em;
+      }
+
+      /* Make footer font smaller on mobile */
+      footer {
+        font-size: 0.9em;
+      }
     }
   </style>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9882692560922710"
@@ -140,13 +203,16 @@
     <a href="#" id="wallet">Wallet</a>
     <a href="mines.html" id="mines-game">Mines</a>
     <a href="tictt.html" id="tic-tac-toe">Tic-Tac-Toe</a>
+    <a href="offers.html" id="offers">Offers</a> <!-- New "Offers" tab -->
   </div>
 
   <!-- Main Content Area -->
   <div class="main-content">
     <div id="main-screen">
       <h2>Welcome!</h2>
-      <p>Click on the menu to open the games or wallet.</p>
+      <p>Click on the menu to open the games or wallet.</p><br>
+      <p>it seems that users are gettin many pins with. glitched game mechanics. it was our fault</p><br>
+      <p>so we adjusted it and you can keep 5% of earned pins</p>
     </div>
   </div>
 
@@ -215,43 +281,43 @@
   
     const userEmailDisplay = document.getElementById('user-email'); // Added reference for email display
 
-async function fetchBalanceAndEmail() {
-  const user = auth.currentUser;
-  if (user) {
-    const userRef = ref(database, 'users/' + user.uid + '/currency');
-    try {
-      // Update user email
-      userEmailDisplay.innerHTML = `Email: ${user.email}`;
+    async function fetchBalanceAndEmail() {
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = ref(database, 'users/' + user.uid + '/currency');
+        try {
+          // Update user email
+          userEmailDisplay.innerHTML = `Email: ${user.email}`;
 
-      // Fetch and update balance
-      const snapshot = await get(userRef);
-      if (snapshot.exists()) {
-        const pins = snapshot.val();
-        balanceDisplay.innerHTML = `Balance: ${pins} Pins`;
+          // Fetch and update balance
+          const snapshot = await get(userRef);
+          if (snapshot.exists()) {
+            const pins = snapshot.val();
+            balanceDisplay.innerHTML = `Balance: ${pins} Pins`;
+          } else {
+            balanceDisplay.innerHTML = `Balance: No data available`;
+          }
+        } catch (error) {
+          console.error("Error retrieving balance:", error);
+          balanceDisplay.innerHTML = `Balance: Error fetching data`;
+        }
       } else {
-        balanceDisplay.innerHTML = `Balance: No data available`;
+        balanceDisplay.innerHTML = `Balance: Please log in`;
+        userEmailDisplay.innerHTML = `Email: Please log in`;
       }
-    } catch (error) {
-      console.error("Error retrieving balance:", error);
-      balanceDisplay.innerHTML = `Balance: Error fetching data`;
     }
-  } else {
-    balanceDisplay.innerHTML = `Balance: Please log in`;
-    userEmailDisplay.innerHTML = `Email: Please log in`;
-  }
-}
 
-// Monitor Auth State Change
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    // User is logged in, fetch and display balance and email
-    fetchBalanceAndEmail();
-  } else {
-    // User is not logged in, show login prompt
-    balanceDisplay.innerHTML = `Balance: Please log in`;
-    userEmailDisplay.innerHTML = `Email: Please log in`;
-  }
-});
+    // Monitor Auth State Change
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is logged in, fetch and display balance and email
+        fetchBalanceAndEmail();
+      } else {
+        // User is not logged in, show login prompt
+        balanceDisplay.innerHTML = `Balance: Please log in`;
+        userEmailDisplay.innerHTML = `Email: Please log in`;
+      }
+    });
   
     // Wallet Section
     walletLink.addEventListener('click', async () => {
@@ -285,6 +351,9 @@ onAuthStateChanged(auth, (user) => {
         console.error("Error logging out:", error);
       }
     });
+    
+
+    
   </script>  
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9882692560922710"
   crossorigin="anonymous"></script>
@@ -295,6 +364,8 @@ onAuthStateChanged(auth, (user) => {
   data-ad-slot="9096794840"
   data-ad-format="auto"
   data-full-width-responsive="true"></ins>
+
+  
 <script>
   (adsbygoogle = window.adsbygoogle || []).push({});
 </script>
