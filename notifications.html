@@ -43,7 +43,7 @@
       border-radius: 5px;
     }
 
-    .notifications-list {
+    .notification-list {
       padding: 20px;
       text-align: center;
     }
@@ -55,7 +55,6 @@
       border-radius: 5px;
       margin-bottom: 15px;
       padding: 15px;
-      text-align: left;
     }
 
     footer {
@@ -75,8 +74,8 @@
   </header>
 
   <!-- Notifications List Section -->
-  <div class="notifications-list" id="notifications-list">
-    <p>Loading notifications...</p>
+  <div class="notification-list" id="notifications-list">
+    <!-- Notifications will be dynamically inserted here -->
   </div>
 
   <footer>
@@ -106,35 +105,34 @@
     const auth = getAuth(app);
     const database = getDatabase(app);
 
-    const notificationsList = document.getElementById('notifications-list');
-
-    async function fetchNotifications() {
+    // Function to display notifications
+    async function displayNotifications() {
+      const notificationsList = document.getElementById('notifications-list');
       const user = auth.currentUser;
+
       if (user) {
-        const userEmail = user.email.replace(/[^a-zA-Z0-9]/g, "_"); // Sanitize email
-        const notificationsRef = ref(database, 'notifications/' + userEmail);
+        const sanitizedEmail = user.email.replace(/[^a-zA-Z0-9]/g, "_");
+        const notificationsRef = ref(database, 'notifications/' + sanitizedEmail);
 
         try {
           const snapshot = await get(notificationsRef);
           if (snapshot.exists()) {
             const notifications = snapshot.val();
-            notificationsList.innerHTML = ''; // Clear loading text
+            notificationsList.innerHTML = ''; // Clear any existing notifications
 
-            for (const [key, message] of Object.entries(notifications)) {
+            // Loop through and display notifications
+            for (let key in notifications) {
               const notificationItem = document.createElement('div');
               notificationItem.classList.add('notification-item');
-              notificationItem.innerHTML = `
-                <strong>${key}</strong><br>
-                ${message}
-              `;
+              notificationItem.innerHTML = `<h4>Notification:</h4><p>${notifications[key]}</p>`;
               notificationsList.appendChild(notificationItem);
             }
           } else {
             notificationsList.innerHTML = '<p>No notifications found.</p>';
           }
         } catch (error) {
-          console.error('Error retrieving notifications:', error);
-          notificationsList.innerHTML = '<p>Error loading notifications.</p>';
+          console.error("Error retrieving notifications:", error);
+          notificationsList.innerHTML = '<p>Error retrieving notifications.</p>';
         }
       } else {
         notificationsList.innerHTML = '<p>Please log in to view notifications.</p>';
@@ -144,13 +142,14 @@
     // Monitor Auth State Change
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // Fetch notifications when user is logged in
-        fetchNotifications();
+        // User is logged in, display notifications
+        displayNotifications();
       } else {
-        // Show message when not logged in
-        notificationsList.innerHTML = '<p>Please log in to view notifications.</p>';
+        // User is not logged in, show login prompt
+        document.getElementById('notifications-list').innerHTML = '<p>Please log in to view notifications.</p>';
       }
     });
   </script>
+
 </body>
 </html>
