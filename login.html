@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module">
+    // Import Firebase functions
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+
+    // Your Firebase configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyDDlGiy8p4Bg1skGy-aOW-bk_FaSEgzrag",
+        authDomain: "earb-bitz.firebaseapp.com",
+        databaseURL: "https://earb-bitz-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "earb-bitz",
+        storageBucket: "earb-bitz.appspot.com",
+        messagingSenderId: "295167569247",
+        appId: "1:295167569247:web:ac3d4ada18f694908b9aea",
+        measurementId: "G-1F9ZKN1BH9"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Get form elements
+    const loginForm = document.querySelector('form');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const errorMessage = document.getElementById('error-message');
+
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = emailInput.value;
+        const password = passwordInput.value;
+
+        try {
+            // Log the user in with Firebase Authentication
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // Redirect to home.html on successful login
+            window.location.href = "home.html";
+        } catch (error) {
+            console.error("Error logging in:", error.message);
+
+            // Display error message
+            if (error.code === "auth/user-not-found") {
+                errorMessage.innerText = "User not found. Please check your email.";
+            } else if (error.code === "auth/wrong-password") {
+                errorMessage.innerText = "Incorrect password. Please try again.";
+            } else {
+                errorMessage.innerText = "Error logging in. Please try again.";
+            }
+        }
+    });
+  </script>
+</head>
+<body>
+  <header>
+    <h1 style="color: white;">Earn Bitz</h1>
+  </header>
+  <form action="" style="color: rgb(237, 104, 3);">
+    <h2 align="center">LOGIN</h2>
+    <div class="userinputs">
+      <input type="email" name="email" id="email" placeholder="email" required>
+    </div>
+    <div class="userinputs">
+      <input type="password" name="password" id="password" placeholder="password" required>
+    </div>
+    <input type="submit" value="LOGIN" class="btn">
+    <div id="error-message" style="color: red; text-align: center;"></div>
+    <div class="signups">
+      Don't have an account? <a href="signup.html">Signup</a>
+    </div>
+  </form>
+  <footer>
+    <p>&copy; 2024 Earn Bitz</p>
+  </footer>
+</body>
+</html>

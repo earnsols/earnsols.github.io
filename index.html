@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <style>
+        body {
+            background: linear-gradient(to top right, red, rgb(247, 104, 3));
+            background-repeat: no-repeat;
+            background-size: 100% 100vh;
+        }
+        img {
+            position: absolute;
+            margin: auto;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            animation: zoomIn 3s ease-in-out forwards;
+        }
+        @keyframes zoomIn {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.2);
+            }
+        }
+    </style>
+    <script>
+        // Redirect to dashboard/login.html after 3 seconds
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 3000);
+    </script>
+</head>
+<body>
+    <img src="logo.png" alt="logo">
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyDDlGiy8p4Bg1skGy-aOW-bk_FaSEgzrag",
+          authDomain: "earb-bitz.firebaseapp.com",
+          projectId: "earb-bitz",
+          storageBucket: "earb-bitz.firebasestorage.app",
+          messagingSenderId: "295167569247",
+          appId: "1:295167569247:web:ac3d4ada18f694908b9aea",
+          measurementId: "G-1F9ZKN1BH9"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+      </script>
+</body>
+</html>

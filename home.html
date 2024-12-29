@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Earn Bitz</title>
+  <style>
+    /* General Reset */
+    * {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      height: 100vh;
+      background: linear-gradient(to right top, red, rgb(237, 104, 3));
+      color: white;
+      flex-direction: column;
+    }
+
+    /* Header Section */
+    header {
+      text-align: center;
+      padding: 20px;
+      font-size: 2.5em;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-left: 30px;
+      margin-bottom: 10px;
+      margin-top: -20px;
+    }
+
+    .logout-btn {
+      background-color: rgb(255, 255, 255);
+      color: rgb(237, 104, 3);
+      border: none;
+      padding: 10px 15px;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .balance {
+      font-size: 1.5em;
+      color: white;
+    }
+
+    /* Menu Button */
+    .menu-btn {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: rgb(255, 255, 255);
+      color: rgb(247, 104, 3);
+      border: none;
+      font-size: 30px;
+      cursor: pointer;
+      transform: rotate(90deg);
+      padding: 10px 15px;
+      border-radius: 5px;
+    }
+
+    /* Menu Section */
+    .menu {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: rgb(255, 255, 255);
+      transition: left 0.3s ease-in-out;
+      padding-top: 60px;
+    }
+
+    .menu a {
+      display: block;
+      padding: 20px;
+      color: rgb(247, 104, 3);
+      text-decoration: none;
+      font-size: 1.5em;
+    }
+
+    .menu a:hover {
+      background-color: #ff7300;
+    }
+
+    /* Main Content Area */
+    .main-content {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      text-align: center;
+      background-color: #fff;
+      color: rgb(237, 104, 3);
+      flex-direction: column;
+    }
+
+    /* Open Menu */
+    .menu.open {
+      left: 0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: rgb(237, 104, 3);
+      color: white;
+    }
+    img{
+      width: 100px;
+      height: 100px;
+    }
+  </style>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9882692560922710"
+  crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <img src="logo.png" alt="logo from earb-bitz">
+    <div class="user-email" id="user-email" style="font-size: medium;">Email: Loading...</div>
+    <div class="balance" id="balance-display" style="font-size: medium;">Balance: Loading...</div>
+    <button class="logout-btn" id="logout-btn">Logout</button>
+  </header>
+  
+
+  <!-- Menu Button -->
+  <button class="menu-btn" id="menu-btn">|||</button>
+
+  <!-- Side Menu -->
+  <div class="menu" id="menu">
+    <a href="#" id="wallet">Wallet</a>
+    <a href="mines.html" id="mines-game">Mines</a>
+    <a href="tictt.html" id="tic-tac-toe">Tic-Tac-Toe</a>
+  </div>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <div id="main-screen">
+      <h2>Welcome!</h2>
+      <p>Click on the menu to open the games or wallet.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2024 Earn Bitz. All Rights Reserved.</p>
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+  
+    // Your Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDDlGiy8p4Bg1skGy-aOW-bk_FaSEgzrag",
+      authDomain: "earb-bitz.firebaseapp.com",
+      databaseURL: "https://earb-bitz-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "earb-bitz",
+      storageBucket: "earb-bitz.appspot.com",
+      messagingSenderId: "295167569247",
+      appId: "1:295167569247:web:ac3d4ada18f694908b9aea",
+      measurementId: "G-1F9ZKN1BH9"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+  
+    // Menu Interactivity
+    const menuBtn = document.getElementById('menu-btn');
+    const menu = document.getElementById('menu');
+    const mainScreen = document.getElementById('main-screen');
+    const walletLink = document.getElementById('wallet');
+    const logoutBtn = document.getElementById('logout-btn');
+    const balanceDisplay = document.getElementById('balance-display');
+  
+    menuBtn.addEventListener('click', () => {
+      menu.classList.toggle('open');
+    });
+  
+    // Store user's balance when they click on a game link
+    document.getElementById('mines-game').addEventListener('click', () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = ref(database, 'users/' + user.uid + '/currency');
+        get(userRef).then((snapshot) => {
+          if (snapshot.exists()) {
+            sessionStorage.setItem('temporaryPins', snapshot.val()); // Save pins to sessionStorage
+          }
+        });
+      }
+    });
+  
+    document.getElementById('tic-tac-toe').addEventListener('click', () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = ref(database, 'users/' + user.uid + '/currency');
+        get(userRef).then((snapshot) => {
+          if (snapshot.exists()) {
+            sessionStorage.setItem('temporaryPins', snapshot.val()); // Save pins to sessionStorage
+          }
+        });
+      }
+    });
+  
+    const userEmailDisplay = document.getElementById('user-email'); // Added reference for email display
+
+async function fetchBalanceAndEmail() {
+  const user = auth.currentUser;
+  if (user) {
+    const userRef = ref(database, 'users/' + user.uid + '/currency');
+    try {
+      // Update user email
+      userEmailDisplay.innerHTML = `Email: ${user.email}`;
+
+      // Fetch and update balance
+      const snapshot = await get(userRef);
+      if (snapshot.exists()) {
+        const pins = snapshot.val();
+        balanceDisplay.innerHTML = `Balance: ${pins} Pins`;
+      } else {
+        balanceDisplay.innerHTML = `Balance: No data available`;
+      }
+    } catch (error) {
+      console.error("Error retrieving balance:", error);
+      balanceDisplay.innerHTML = `Balance: Error fetching data`;
+    }
+  } else {
+    balanceDisplay.innerHTML = `Balance: Please log in`;
+    userEmailDisplay.innerHTML = `Email: Please log in`;
+  }
+}
+
+// Monitor Auth State Change
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // User is logged in, fetch and display balance and email
+    fetchBalanceAndEmail();
+  } else {
+    // User is not logged in, show login prompt
+    balanceDisplay.innerHTML = `Balance: Please log in`;
+    userEmailDisplay.innerHTML = `Email: Please log in`;
+  }
+});
+  
+    // Wallet Section
+    walletLink.addEventListener('click', async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = ref(database, 'users/' + user.uid + '/currency');
+        try {
+          const snapshot = await get(userRef);
+          if (snapshot.exists()) {
+            const pins = snapshot.val();
+            mainScreen.innerHTML = `<h2>Wallet</h2><p>Your balance is: ${pins} Pins.<BR> Withdrawal available from 10 jan.<BR> 1000PINS = 1$</p>`;
+          } else {
+            mainScreen.innerHTML = `<h2>Wallet</h2><p>No data available.</p>`;
+          }
+        } catch (error) {
+          console.error("Error retrieving wallet data:", error);
+          mainScreen.innerHTML = `<h2>Wallet</h2><p>Error retrieving wallet data.</p>`;
+        }
+  
+        // Close the menu after opening the wallet
+        menu.classList.remove('open');
+      }
+    });
+  
+    // Logout Functionality
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await signOut(auth);
+        window.location.href = "login.html";
+      } catch (error) {
+        console.error("Error logging out:", error);
+      }
+    });
+  </script>  
+</body>
+</html>

@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minesweeper - Earn Bitz</title>
+  
+  <style>
+    /* General body and page styling */
+   /* General body and page styling */
+/* General body and page styling */
+body {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to top right, red, rgb(247, 104, 3));
+  color: #ffffff;
+  display: flex;
+  flex-direction: column; /* Stack header, main content, and footer vertically */
+  justify-content: space-between; /* Ensure the footer stays at the bottom */
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Header (containing title and back button) */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: #28a745;
+  width: 100%;
+  box-sizing: border-box;
+  background-size: 2000px;
+}
+
+header h1 {
+  color: #fff;
+  font-size: 24px;
+  margin: 0;
+}
+
+header button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+header button:hover {
+  background-color: #218838;
+}
+
+/* Container for the Mines game */
+/* Container for the Mines game */
+#game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center content horizontally */
+  justify-content: center; /* Center content vertically */
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px; /* Adjust width for better mobile compatibility */
+  height: 100%; /* Ensure it takes full height of available space */
+  box-sizing: border-box;
+  flex-grow: 1;
+  margin: 10px 0; /* Add margin to provide spacing between header and footer */
+}
+
+/* Board styling */
+#board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  width: 100%;
+  max-width: 250px; /* Adjust for mobile view */
+  margin: 0 auto; /* Ensure the board is centered horizontally */
+}
+
+/* Each individual cell */
+.cell {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #ff4c4c, rgb(247, 104, 3)); /* Red to gradient orange */
+  border: 1px solid #aaa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 14px; /* Reduced font size for smaller screens */
+}
+
+.cell:hover {
+  background: linear-gradient(135deg, #ff7b7b, rgb(247, 140, 3)); /* Slightly lighter gradient on hover */
+}
+
+
+/* Revealed cell styling */
+.cell.revealed {
+  background: linear-gradient(135deg, #e0e0e0, rgb(247, 104, 3)); /* Lighter gradient for revealed cells */
+  color: #ffffff;
+}
+
+/* Styling for cells with mines */
+.cell.mine {
+  background: linear-gradient(135deg, #ff1f1f, rgb(247, 56, 3)); /* Darker red-orange gradient for mines */
+  color: white;
+}
+
+/* Button and interaction styles */
+button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-top: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  width: 100%; /* Make buttons stretch to full width */
+  max-width: 200px; /* Limit width for better UI */
+}
+
+button:hover {
+  background-color: #218838;
+}
+
+/* Status text for game information */
+#status {
+  font-size: 18px;
+  margin-top: 20px;
+  color: #ffffff;
+  text-align: center;
+}
+
+/* Error message styling */
+#errorMessage {
+  color: red;
+  display: none;
+  font-size: 14px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+/* Bet display and control styling */
+#betAmountDisplay {
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+#betSlider {
+  width: 100%;
+  margin-top: 10px;
+}
+
+#minesSlider {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* Text for multiplier and mines count */
+.multiplier {
+  font-size: 16px;
+  margin-top: 5px;
+  text-align: center;
+}
+
+#minesCount {
+  font-size: 16px;
+  margin-top: 5px;
+  text-align: center;
+}
+
+/* Footer styling */
+footer {
+  background-color: #28a745;
+  color: white;
+  padding: 10px;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* Mobile-friendly adjustments */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 20px;
+  }
+
+  /* Adjust board layout for smaller screens */
+  #board {
+    grid-template-columns: repeat(5, 1fr); /* Keeps the grid layout but makes it flexible */
+    gap: 5px;
+  }
+
+  /* Increase button size for easier tapping */
+  button {
+    padding: 12px 20px;
+    font-size: 18px;
+  }
+
+  /* Adjust font size of multiplier and status text */
+  .multiplier, #status, #minesCount {
+    font-size: 14px;
+  }
+
+  /* Reduce the size of the bet and mines sliders */
+  #betSlider, #minesSlider {
+    height: 30px;
+    font-size: 14px;
+  }
+
+  /* Adjust the game container for smaller screens */
+  #game-container {
+    padding: 15px;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <!-- Back Button -->
+  <center><button class="back-btn" onclick="window.location.href='home.html';">Back to Home</button></center>
+
+  <header>
+    <h1>Earn Bitz: Minesweeper</h1>
+  </header>
+  <main>
+    <div id="currency">Total PINS: 0</div>
+    <div id="status">You need 2 pins to play.</div>
+    <div id="board" class="board"></div>
+    <div class="multiplier">Current Multiplier: 1x</div>
+    <div>
+      <label for="minesSlider" style="color: white;">Select Number of Mines (1-24):</label>
+      <input type="range" id="minesSlider" min="1" max="24" value="1" />
+      <span id="minesCount" style="color: white;">1</span>
+    </div>
+
+    <!-- Bet Amount Selection -->
+    <div>
+      <label for="betSlider" style="color: white;">Select Bet Amount (1-1000):</label>
+      <input type="range" id="betSlider" min="1" max="1000" value="2" />
+      <span id="betAmountDisplay" style="color: white;">2</span> PINS
+    </div>
+
+    <div id="errorMessage" class="error" style="display: none;">Bet amount cannot exceed available PINS!</div>
+
+    <center>
+      <button id="startButton">Start Game</button>
+      <button id="resetButton" style="display:none;">Reset Game</button>
+      <button id="stopButton" style="display:none;">Cash Out</button>
+    </center>
+  </main>
+  <footer>
+    <p>&copy; 2024 Earn Bitz</p>
+  </footer>
+
+  <script type="module">
+    // Import Firebase functions
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+  
+    // Your Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDDlGiy8p4Bg1skGy-aOW-bk_FaSEgzrag",
+      authDomain: "earb-bitz.firebaseapp.com",
+      databaseURL: "https://earb-bitz-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "earb-bitz",
+      storageBucket: "earb-bitz.appspot.com",
+      messagingSenderId: "295167569247",
+      appId: "1:295167569247:web:ac3d4ada18f694908b9aea",
+      measurementId: "G-1F9ZKN1BH9"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+  
+    // Fetch user data from Firebase and store it in localStorage
+    function fetchUserPins() {
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = ref(database, 'users/' + user.uid);
+        get(userRef).then((snapshot) => {
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            const pins = userData.currency;
+            console.log("Fetched pins from Firebase:", pins);
+            window.localStorage.setItem('pins', pins);  // Store pins in localStorage
+            document.getElementById('currency').textContent = `Total PINS: ${pins}`;
+          } else {
+            console.log("No user data available");
+          }
+        }).catch((error) => {
+          console.error("Error fetching user data: ", error);
+        });
+      } else {
+        console.log("No user logged in");
+        // Handle redirect to login page or show an alert
+        window.location.href = "login.html";  // Redirect to login if no user is authenticated
+      }
+    }
+  
+    // Update user pins in Firebase
+    function updateUserPins(newPins) {
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = ref(database, 'users/' + user.uid);
+        set(userRef, {
+          currency: newPins
+        }).then(() => {
+          console.log("User pins updated!");
+          window.localStorage.setItem('pins', newPins);  // Update pins in localStorage
+          document.getElementById('currency').textContent = `Total PINS: ${newPins}`;
+        }).catch((error) => {
+          console.error("Error updating user pins: ", error);
+        });
+      }
+    }
+  
+    // Wait for the page to load completely
+    document.addEventListener('DOMContentLoaded', () => {
+      const storedPins = window.localStorage.getItem('pins');
+      if (storedPins) {
+        document.getElementById('currency').textContent = `Total PINS: ${storedPins}`;
+      }
+  
+      const boardElement = document.getElementById('board');
+      const statusText = document.getElementById('status');
+      const startButton = document.getElementById('startButton');
+      const resetButton = document.getElementById('resetButton');
+      const stopButton = document.getElementById('stopButton');
+      const multiplierText = document.querySelector('.multiplier');
+      const minesSlider = document.getElementById('minesSlider');
+      const minesCountText = document.getElementById('minesCount');
+      const betSlider = document.getElementById('betSlider');
+      const betAmountDisplay = document.getElementById('betAmountDisplay');
+      const errorMessage = document.getElementById('errorMessage');
+      const pinsRequired = 2;
+      let pins = storedPins ? parseInt(storedPins) : 0;  // Default to 0 if no pins in localStorage
+      let currentMultiplier = 1;
+      let gameOver = false;
+      let openedCells = 0;
+      let board = [];
+      let totalMines = 1; // Default to 1 mine
+      let betAmount = 2; // Default bet amount
+  
+      console.log("Initial pins value:", pins);  // Log to check the initial pin value
+  
+      // Update mines count from slider
+      minesSlider.addEventListener('input', () => {
+        totalMines = parseInt(minesSlider.value);
+        minesCountText.textContent = totalMines;
+        currentMultiplier = 1; // Reset multiplier to 1x when mines are adjusted
+        multiplierText.textContent = `Current Multiplier: ${currentMultiplier.toFixed(2)}x`;
+      });
+  
+      // Update bet amount from slider
+      betSlider.addEventListener('input', () => {
+        betAmount = parseInt(betSlider.value);
+        if (betAmount > pins) {
+          betSlider.value = pins;
+          betAmount = pins;
+          errorMessage.style.display = 'inline';
+        } else {
+          errorMessage.style.display = 'none';
+        }
+        betAmountDisplay.textContent = betAmount;
+      });
+  
+      // Function to create a new game board
+      function createBoard() {
+        const totalCells = 25;
+        const minesArray = Array(totalCells).fill(false);
+        for (let i = 0; i < totalMines; i++) {
+          let minePosition = Math.floor(Math.random() * totalCells);
+          while (minesArray[minePosition]) {
+            minePosition = Math.floor(Math.random() * totalCells);
+          }
+          minesArray[minePosition] = true;
+        }
+        return minesArray;
+      }
+  
+      // Start game
+      startButton.addEventListener('click', () => {
+        if (pins < pinsRequired) {
+          statusText.textContent = "You need at least 2 pins to play.";
+          return;
+        }
+  
+        pins -= betAmount;
+        updateUserPins(pins);  // Update the pins in Firebase and localStorage
+        board = createBoard();
+        openedCells = 0;
+        gameOver = false;
+  
+        boardElement.innerHTML = ''; // Clear any existing board
+        for (let i = 0; i < 25; i++) {
+          const cell = document.createElement('div');
+          cell.classList.add('cell');
+          cell.addEventListener('click', () => handleCellClick(i, cell));
+          boardElement.appendChild(cell);
+        }
+  
+        statusText.textContent = `You have ${totalMines} mines to avoid.`;
+        startButton.style.display = 'none'; // Hide Start Game button during game
+        stopButton.style.display = 'inline'; // Show Cash Out button
+        resetButton.style.display = 'none'; // Hide Reset Game button
+        currentMultiplier = 1;  // Reset multiplier to 1x when a new game starts
+        multiplierText.textContent = `Current Multiplier: ${currentMultiplier.toFixed(2)}x`;
+      });
+  
+      // Handle cell click
+      function handleCellClick(index, cell) {
+        if (gameOver || cell.classList.contains('revealed')) return;
+  
+        if (board[index]) {
+          cell.classList.add('mine');
+          statusText.textContent = "Game Over! You hit a mine.";
+          stopButton.style.display = 'none'; // Hide Cash Out button
+          resetButton.style.display = 'inline'; // Show Reset button when the game ends by mine
+          gameOver = true;
+        } else {
+          openedCells++;
+          cell.classList.add('revealed');
+          currentMultiplier += 0.1;  // Increase multiplier for each safe cell clicked
+          multiplierText.textContent = `Current Multiplier: ${currentMultiplier.toFixed(2)}x`;
+  
+          if (openedCells >= 24 - totalMines) {
+            statusText.textContent = "You won! All safe cells are revealed.";
+            stopButton.style.display = 'none';  // Hide Cash Out button after game is completed
+            resetButton.style.display = 'inline';  // Show Reset button
+            gameOver = true;
+          }
+        }
+      }
+  
+      // Cash out functionality
+      stopButton.addEventListener('click', () => {
+        if (gameOver) return;
+        pins += betAmount * currentMultiplier;
+        updateUserPins(pins);  // Update currency after cash out
+        statusText.textContent = `You cashed out at ${currentMultiplier.toFixed(2)}x multiplier.`;
+        stopButton.style.display = 'none'; // Hide Cash Out button after cash out
+        resetButton.style.display = 'inline'; // Show Reset Game button
+      });
+  
+      // Reset game
+resetButton.addEventListener('click', () => {
+  if (pins >= betAmount) {
+    // Deduct bet amount from pins when the reset button is clicked
+    pins -= betAmount;
+    updateUserPins(pins);  // Update the pins in Firebase and localStorage
+
+    gameOver = false;
+    openedCells = 0;
+    board = createBoard();
+    boardElement.innerHTML = ''; // Clear board for reset
+    for (let i = 0; i < 25; i++) {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.addEventListener('click', () => handleCellClick(i, cell));
+      boardElement.appendChild(cell);
+    }
+    statusText.textContent = `You have ${totalMines} mines to avoid.`;
+    resetButton.style.display = 'none'; // Hide Reset Game button after reset
+    stopButton.style.display = 'inline'; // Show Cash Out button
+    startButton.style.display = 'none'; // Hide Start Game button
+    currentMultiplier = 1; // Reset multiplier to 1x after reset
+    multiplierText.textContent = `Current Multiplier: ${currentMultiplier.toFixed(0)}x`;
+  } else {
+    alert("Not enough balance to reset the game."); // If not enough balance to reset
+  }
+});
+
+  
+      // Check for authentication status
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          console.log("User is logged in:", user);
+          fetchUserPins();
+        } else {
+          console.log("No user is logged in");
+          window.location.href = "login.html";  // Redirect to login page if no user is logged in
+        }
+      });
+    });
+  </script>
+</html>
