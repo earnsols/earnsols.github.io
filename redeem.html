@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redeem Offer</title>
+  <style>
+    /* General Reset */
+    * {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(to right top, red, rgb(237, 104, 3));
+      color: white;
+      font-size: 1rem;
+    }
+
+    /* Header Section */
+    header {
+      text-align: center;
+      padding: 20px;
+      font-size: 2.5em;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-left: 30px;
+      margin-bottom: 10px;
+      margin-top: -20px;
+    }
+
+    .back-btn {
+      background-color: rgb(255, 255, 255);
+      color: rgb(237, 104, 3);
+      border: none;
+      padding: 10px 15px;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    /* Claim Section */
+    .claim-section {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .input-box {
+      margin-bottom: 15px;
+      padding: 10px;
+      font-size: 1em;
+      width: 80%;
+      max-width: 300px;
+    }
+
+    .claim-btn {
+      background-color: rgb(237, 104, 3);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1.2em;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .claim-btn:hover {
+      background-color: #ff7300;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: rgb(237, 104, 3);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <button class="back-btn" onclick="window.location.href='home.html'">Back to Home</button>
+    <div class="balance">Redeem Offer</div>
+  </header>
+
+  <!-- Claim Section -->
+  <div class="claim-section">
+    <p>Enter your email and the code to claim 1000 Pins! (One-time only)</p>
+    <input type="text" id="email" class="input-box" placeholder="Enter your email" required>
+    <input type="text" id="code" class="input-box" placeholder="Enter the code" required>
+    <button class="claim-btn" id="claim-button">Claim</button>
+  </div>
+
+  <footer>
+    <p>&copy; 2024 Earn Bitz. All Rights Reserved.</p>
+  </footer>
+
+  <!-- Firebase Scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDDlGiy8p4Bg1skGy-aOW-bk_FaSEgzrag",
+      authDomain: "earb-bitz.firebaseapp.com",
+      databaseURL: "https://earb-bitz-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "earb-bitz",
+      storageBucket: "earb-bitz.appspot.com",
+      messagingSenderId: "295167569247",
+      appId: "1:295167569247:web:ac3d4ada18f694908b9aea",
+      measurementId: "G-1F9ZKN1BH9"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+
+    // Claim Button Logic
+    document.getElementById('claim-button').addEventListener('click', async function() {
+      const emailInput = document.getElementById('email').value;
+      const codeInput = document.getElementById('code').value;
+
+      if (codeInput === "Qs5dvTYehgv") {
+        // Sanitize the email to create a valid Firebase path
+        const sanitizedEmail = emailInput.replace(/[^a-zA-Z0-9]/g, "_"); // Replace non-alphanumeric characters with "_"
+
+        const userRef = ref(database, 'redeemed/' + sanitizedEmail);
+        const snapshot = await get(userRef);
+
+        if (snapshot.exists()) {
+          alert('This email has already claimed the offer!');
+        } else {
+          // Update the user's balance with 1000 pins and mark as redeemed
+          const user = auth.currentUser;
+          if (user) {
+            const userRef = ref(database, 'users/' + user.uid + '/currency');
+            const snapshot = await get(userRef);
+            if (snapshot.exists()) {
+              let currentBalance = snapshot.val();
+              const updatedBalance = currentBalance + 1000;
+              await set(userRef, updatedBalance);
+              // Mark this email as redeemed
+              await set(ref(database, 'redeemed/' + sanitizedEmail), true);
+              alert('1000 Pins have been added to your account!');
+            }
+          }
+        }
+      } else {
+        alert('Invalid code. Please try again.');
+      }
+    });
+  </script>
+</body>
+</html>
