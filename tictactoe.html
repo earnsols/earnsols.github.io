@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe - Earn Bitz</title>
+  <style>
+    /* General Reset */
+    * {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(to right top, red, rgb(237, 104, 3)) no-repeat;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: rgb(237, 104, 3);
+    }
+
+    h1 {
+      color: white;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 5px;
+      margin: 20px 0;
+    }
+
+    .cell {
+      width: 100px;
+      height: 100px;
+      background: white;
+      border: 2px solid rgb(237, 104, 3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2em;
+      cursor: pointer;
+      color: rgb(237, 104, 3);
+    }
+
+    .cell.disabled {
+      pointer-events: none;
+    }
+
+    #status {
+      margin: 20px;
+      font-size: 1.2em;
+      color: white;
+    }
+
+    #currency {
+      font-size: 1.5em;
+      color: white;
+    }
+
+    #resetButton {
+      height: 45px;
+      width: 150px;
+      border: none;
+      border-radius: 10px;
+      background: white;
+      color: rgb(237, 104, 3);
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    #resetButton:hover {
+      background: rgb(237, 104, 3);
+      color: white;
+    }
+
+    footer {
+      margin-top: 20px;
+      color: white;
+    }
+
+    /* Back Button Style */
+    .back-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: white;
+      color: rgb(237, 104, 3);
+      font-size: 1.5em;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .back-btn:hover {
+      background-color: rgb(237, 104, 3);
+      color: white;
+    }
+  </style>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9882692560922710"
+  crossorigin="anonymous"></script>
+</head>
+<body>
+  <!-- Back Button -->
+  <button class="back-btn" onclick="window.location.href='home.html';">Back to Home</button>
+
+  <header>
+    <h1>Earn Bitz: Tic Tac Toe</h1>
+  </header>
+  <main>
+    <div id="board"></div>
+    <div id="status">Player X's turn</div>
+    <div id="currency">Total PINS: Loading...</div>
+    <button id="resetButton">Reset Game</button>
+  </main>
+  <footer>
+    <p>&copy; 2024 Earn Bitz</p>
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+    // Your Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDDlGiy8p4Bg1skGy-aOW-bk_FaSEgzrag",
+      authDomain: "earb-bitz.firebaseapp.com",
+      databaseURL: "https://earb-bitz-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "earb-bitz",
+      storageBucket: "earb-bitz.appspot.com",
+      messagingSenderId: "295167569247",
+      appId: "1:295167569247:web:ac3d4ada18f694908b9aea",
+      measurementId: "G-1F9ZKN1BH9"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+
+    // Game Variables
+    const board = document.getElementById('board');
+    const statusText = document.getElementById('status');
+    const currencyText = document.getElementById('currency');
+    const resetButton = document.getElementById('resetButton');
+
+    let currentPlayer = 'X';
+    let boardState = ['', '', '', '', '', '', '', '', ''];
+    let totalPins = 0;
+
+    const winningCombinations = [
+      [0, 1, 2], [3, 4, 5], [6, 7, 8],
+      [0, 3, 6], [1, 4, 7], [2, 5, 8],
+      [0, 4, 8], [2, 4, 6]
+    ];
+
+    function createBoard() {
+      board.innerHTML = '';
+      boardState.forEach((cell, index) => {
+        const cellDiv = document.createElement('div');
+        cellDiv.classList.add('cell');
+        cellDiv.dataset.index = index;
+        cellDiv.textContent = cell;
+        cellDiv.addEventListener('click', onCellClick);
+        board.appendChild(cellDiv);
+      });
+    }
+
+    function onCellClick(event) {
+      const cellIndex = event.target.dataset.index;
+      if (boardState[cellIndex] === '' && currentPlayer === 'X') {
+        boardState[cellIndex] = currentPlayer;
+        event.target.textContent = currentPlayer;
+        checkWinner();
+        if (!isGameOver()) {
+          currentPlayer = 'O';
+          statusText.textContent = `Player ${currentPlayer}'s turn`;
+          setTimeout(makeAIMove, 500);
+        }
+      }
+    }
+
+    function makeAIMove() {
+      const availableCells = boardState
+        .map((cell, index) => (cell === '' ? index : null))
+        .filter(index => index !== null);
+
+      if (availableCells.length > 0) {
+        const randomIndex = Math.floor(Math.random() * availableCells.length);
+        const cellIndex = availableCells[randomIndex];
+        boardState[cellIndex] = 'O';
+        const cellDiv = board.querySelector(`[data-index="${cellIndex}"]`);
+        cellDiv.textContent = 'O';
+        checkWinner();
+        if (!isGameOver()) {
+          currentPlayer = 'X';
+          statusText.textContent = `Player ${currentPlayer}'s turn`;
+        }
+      }
+    }
+
+    function checkWinner() {
+      let winner = null;
+
+      winningCombinations.forEach(combination => {
+        const [a, b, c] = combination;
+        if (
+          boardState[a] &&
+          boardState[a] === boardState[b] &&
+          boardState[a] === boardState[c]
+        ) {
+          winner = boardState[a];
+        }
+      });
+
+      if (winner) {
+        statusText.textContent = `Player ${winner} wins!`;
+        if (winner === 'X') {
+          totalPins += 5; // Player earns 5 pins for winning
+        }
+        currencyText.textContent = `Total PINS: ${totalPins}`;
+        disableBoard();
+        updatePinsInDatabase(); // Update pins in the database
+      } else if (!boardState.includes('')) {
+        statusText.textContent = 'It\'s a draw!';
+      }
+    }
+
+    function isGameOver() {
+      return statusText.textContent.includes('wins') || statusText.textContent.includes('draw');
+    }
+
+    function disableBoard() {
+      document.querySelectorAll('.cell').forEach(cell => {
+        cell.classList.add('disabled');
+      });
+    }
+
+    function resetGame() {
+      boardState = ['', '', '', '', '', '', '', '', ''];
+      currentPlayer = 'X';
+      statusText.textContent = 'Player X\'s turn';
+      createBoard();
+    }
+
+    resetButton.addEventListener('click', resetGame);
+
+    function fetchBalance() {
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = ref(database, 'users/' + user.uid + '/currency');
+        get(userRef).then(snapshot => {
+          if (snapshot.exists()) {
+            totalPins = snapshot.val(); // Fetch balance from DB
+            currencyText.textContent = `Total PINS: ${totalPins}`;
+          } else {
+            currencyText.textContent = `Total PINS: 0`;
+          }
+        });
+      }
+    }
+
+    function updatePinsInDatabase() {
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = ref(database, 'users/' + user.uid + '/currency');
+        set(userRef, totalPins); // Update the pins in the database
+      }
+    }
+
+    // Fetch user's balance on page load
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        fetchBalance(); // Fetch and display the balance
+      } else {
+        currencyText.textContent = `Total PINS: Please log in`;
+      }
+    });
+
+    createBoard(); // Initialize the board
+  </script>
+</body>
+</html>

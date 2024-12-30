@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Earn Bitz</title>
   <style>
-    /* General Reset */
+    /* Styles for layout, popups, and other elements */
     * {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
       margin: 0;
@@ -19,96 +19,78 @@
       min-height: 100vh;
       background: linear-gradient(to right top, red, rgb(237, 104, 3));
       color: white;
-      font-size: 1rem; /* Default font size for readability */
+      font-size: 1rem;
     }
 
-    /* Header Section */
     header {
       text-align: center;
       padding: 20px;
       font-size: 2.5em;
       color: white;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-left: 30px;
-      margin-bottom: 10px;
-      margin-top: -20px;
+      position: relative;
     }
-
-    .logout-btn {
-      background-color: rgb(255, 255, 255);
-      color: rgb(237, 104, 3);
+    .edit-profile-btn{
+      background-color: rgb(237, 104, 3);
+      color: white;
       border: none;
-      padding: 10px 15px;
-      font-size: 1em;
+      padding: 10px 20px;
       cursor: pointer;
       border-radius: 5px;
     }
 
-    .balance {
-      font-size: 1.5em;
+    #logout-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: white;
+      color: rgb(237, 104, 3);
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    #logout-button:hover {
+      background-color: rgb(237, 104, 3);
       color: white;
     }
 
-    /* Menu Button */
-    .menu-btn {
-      position: fixed;
+    #notifications-icon {
+      position: absolute;
       top: 20px;
-      left: 20px;
-      background-color: rgb(255, 255, 255);
-      color: rgb(247, 104, 3);
-      border: none;
-      font-size: 30px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
       cursor: pointer;
-      transform: rotate(90deg);
-      padding: 10px 15px;
-      border-radius: 5px;
+      filter: invert(100);
     }
 
-    /* Menu Section */
-    .menu {
-      position: fixed;
-      top: 0;
-      left: -250px;
-      width: 250px;
-      height: 100%;
-      background-color: rgb(255, 255, 255);
-      transition: left 0.3s ease-in-out;
-      padding-top: 60px;
-    }
-
-    .menu a {
-      display: block;
-      padding: 20px;
-      color: rgb(247, 104, 3);
-      text-decoration: none;
-      font-size: 1.5em;
-    }
-
-    .menu a:hover {
-      background-color: #ff7300;
-    }
-
-    /* Main Content Area */
     .main-content {
       flex-grow: 1;
       display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
+      padding: 2px;
       text-align: center;
       background-color: #fff;
       color: rgb(237, 104, 3);
       flex-direction: column;
     }
 
-    /* Open Menu */
-    .menu.open {
-      left: 0;
+    .bottom-nav {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background-color: rgb(237, 104,3);
+      padding: 10px 0;
+      border-top: 2px solid rgb(237, 104, 3);
     }
 
-    /* Footer */
+    .bottom-nav img {
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      filter: invert(100%) hue-rotate(-10deg) saturate(30%); /* Change the filter for orange-red color */
+    }
+
     footer {
       text-align: center;
       padding: 10px;
@@ -116,118 +98,148 @@
       color: white;
     }
 
-    img {
+    .game-image {
       width: 100px;
       height: 100px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      margin-right: 20px;
     }
 
-    /* Media Queries for Mobile Responsiveness */
-    @media screen and (max-width: 768px) {
-      /* Adjust the header layout */
-      header {
-        flex-direction: column;
-        text-align: center;
-        font-size: 2rem;
-      }
-
-      /* Adjust menu button and header */
-      .menu-btn {
-        font-size: 25px;
-        top: 10px;
-        left: 10px;
-      }
-
-      /* Adjust balance section */
-      .balance {
-        font-size: 1.2em;
-      }
-
-      /* Adjust menu width for mobile */
-      .menu {
-        width: 200px;
-      }
-
-      /* Adjust main content font size */
-      .main-content {
-        padding: 10px;
-        font-size: 1.2em;
-      }
+    .game-image:hover {
+      transform: scale(1.2);
     }
 
-    @media screen and (max-width: 480px) {
-      /* Header text size */
-      header {
-        font-size: 1.8em;
-      }
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      margin-left: 50px;
+    }
 
-      /* Adjust main content font size */
-      .main-content {
-        font-size: 1.1em;
-      }
+    ul li {
+      margin-bottom: 10px;
+    }
 
-      /* Reduce padding */
-      .main-content {
-        padding: 10px;
-      }
+    .games-heading {
+      text-align: left;
+      margin-left: 50px;
+      margin-bottom: 20px;
+    }
 
-      /* Reduce font size in menu */
-      .menu a {
-        font-size: 1.2em;
-      }
+    #edit-profile-popup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
 
-      /* Make footer font smaller on mobile */
-      footer {
-        font-size: 0.9em;
-      }
+    .popup-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: center;
+    }
+
+    .popup-content input,
+    .popup-content select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .popup-content button {
+      padding: 10px 20px;
+      margin: 10px 5px;
+      border: none;
+      border-radius: 5px;
+      background-color: #2379dd;
+      color: white;
+      cursor: pointer;
+    }
+
+    .popup-content button:hover {
+      background-color: #1a5bbf;
+    }
+
+    .popup-content .cancel {
+      background-color: #f44336;
+    }
+
+    /* Profile layout adjustments */
+    .profile-section {
+      text-align: left;
+      margin-left: 50px;
+      margin-top: 20px;
+    }
+
+    .profile-section h2 {
+      margin-bottom: 20px;
+    }
+
+    .profile-section p {
+      margin: 10px 0;
+    }
+    .banner{
+      width: 480px;
+      height: 113px;
+      margin-top: 340px;
     }
   </style>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9882692560922710"
-  crossorigin="anonymous"></script>
 </head>
 <body>
-
+  
   <!-- Header -->
   <header>
-    <img src="logo.png" alt="logo from earb-bitz">
-    <div class="user-email" id="user-email" style="font-size: medium;">Email: Loading...</div>
-    <div class="balance" id="balance-display" style="font-size: medium;">Balance: Loading...</div>
-    <button class="logout-btn" id="logout-btn">Logout</button>
+    Earn Bitz
+    <button id="logout-button" onclick="logout()">Logout</button>
+    <a href="notifications.html"><img src="notifications.png" alt="Notifications" id="notifications-icon"></a>
   </header>
-  
-
-  <!-- Menu Button -->
-  <button class="menu-btn" id="menu-btn">|||</button>
-
-  <!-- Side Menu -->
-  <div class="menu" id="menu">
-    <a href="#" id="wallet">Wallet</a>
-    <a href="mines.html" id="mines-game">Mines</a>
-    <a href="tictt.html" id="tic-tac-toe">Tic-Tac-Toe</a>
-    <a href="offers.html" id="offers">Offers</a> <!-- New "Offers" tab -->
-    <a href="notifications.html" id="Notifications">Notifications</a>
-    <a href="redeem.html" id="redeem">Redeem</a>
-  </div>
 
   <!-- Main Content Area -->
-  <div class="main-content">
-    <div id="main-screen">
-      <h2>Welcome!</h2>
-      <p>Click on the menu to open the games or wallet.</p><br>
-      <p>it seems that users are getting many pins with. glitched game mechanics. it was our fault</p><br>
-      <p>so we adjusted it and you can keep 5% of earned pins</p>
+  <div class="main-content" id="main-content">
+    <h2>Welcome!</h2>
+    <p>Click on the icons below to navigate.</p>
+  </div>
+
+  <!-- Bottom Navigation Bar -->
+  <div class="bottom-nav">
+    <img src="games.png" alt="Games" id="games-icon">
+    <img src="wallet.png" alt="Wallet" id="wallet-icon">
+    <img src="home.png" alt="Home" id="home-icon">
+    <img src="profile.png" alt="Profile" id="profile-icon">
+  </div>
+
+  <!-- Footer -->
+
+  <!-- Edit Profile Popup -->
+  <div id="edit-profile-popup">
+    <div class="popup-content">
+      <h2>Edit Profile</h2>
+      <input type="text" id="name" placeholder="Enter your Name">
+      <input type="text" id="username" placeholder="Enter your Username">
+      <select id="country"></select>
+      <button class="save" onclick="saveProfile()">Save</button>
+      <button class="cancel" onclick="closeEditProfilePopup()">Cancel</button>
     </div>
   </div>
 
-  <footer>
-    <p>&copy; 2024 Earn Bitz. All Rights Reserved.</p>
-  </footer>
-
+  <!-- Firebase and App Scripts -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
-  
-    // Your Firebase Configuration
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+    // Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyDDlGiy8p4Bg1skGy-aOW-bk_FaSEgzrag",
       authDomain: "earb-bitz.firebaseapp.com",
@@ -238,91 +250,36 @@
       appId: "1:295167569247:web:ac3d4ada18f694908b9aea",
       measurementId: "G-1F9ZKN1BH9"
     };
-  
+
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const database = getDatabase(app);
-  
-    // Menu Interactivity
-    const menuBtn = document.getElementById('menu-btn');
-    const menu = document.getElementById('menu');
-    const mainScreen = document.getElementById('main-screen');
-    const walletLink = document.getElementById('wallet');
-    const logoutBtn = document.getElementById('logout-btn');
-    const balanceDisplay = document.getElementById('balance-display');
-  
-    menuBtn.addEventListener('click', () => {
-      menu.classList.toggle('open');
-    });
-  
-    // Store user's balance when they click on a game link
-    document.getElementById('mines-game').addEventListener('click', () => {
-      const user = auth.currentUser;
-      if (user) {
-        const userRef = ref(database, 'users/' + user.uid + '/currency');
-        get(userRef).then((snapshot) => {
-          if (snapshot.exists()) {
-            sessionStorage.setItem('temporaryPins', snapshot.val()); // Save pins to sessionStorage
-          }
-        });
-      }
-    });
-  
-    document.getElementById('tic-tac-toe').addEventListener('click', () => {
-      const user = auth.currentUser;
-      if (user) {
-        const userRef = ref(database, 'users/' + user.uid + '/currency');
-        get(userRef).then((snapshot) => {
-          if (snapshot.exists()) {
-            sessionStorage.setItem('temporaryPins', snapshot.val()); // Save pins to sessionStorage
-          }
-        });
-      }
-    });
-  
-    const userEmailDisplay = document.getElementById('user-email'); // Added reference for email display
 
-    async function fetchBalanceAndEmail() {
-      const user = auth.currentUser;
-      if (user) {
-        const userRef = ref(database, 'users/' + user.uid + '/currency');
-        try {
-          // Update user email
-          userEmailDisplay.innerHTML = `Email: ${user.email}`;
+    const mainContent = document.getElementById('main-content');
+    const homeIcon = document.getElementById('home-icon');
+    const walletIcon = document.getElementById('wallet-icon');
+    const gamesIcon = document.getElementById('games-icon');
+    const profileIcon = document.getElementById('profile-icon');
+    const editProfilePopup = document.getElementById('edit-profile-popup');
+    const countries = ['USA', 'Canada', 'India', 'Australia', 'UK', 'Germany', 'France', 'Brazil'];
 
-          // Fetch and update balance
-          const snapshot = await get(userRef);
-          if (snapshot.exists()) {
-            const pins = snapshot.val();
-            balanceDisplay.innerHTML = `Balance: ${pins} Pins`;
-          } else {
-            balanceDisplay.innerHTML = `Balance: No data available`;
-          }
-        } catch (error) {
-          console.error("Error retrieving balance:", error);
-          balanceDisplay.innerHTML = `Balance: Error fetching data`;
-        }
-      } else {
-        balanceDisplay.innerHTML = `Balance: Please log in`;
-        userEmailDisplay.innerHTML = `Email: Please log in`;
-      }
-    }
-
-    // Monitor Auth State Change
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // User is logged in, fetch and display balance and email
-        fetchBalanceAndEmail();
-      } else {
-        // User is not logged in, show login prompt
-        balanceDisplay.innerHTML = `Balance: Please log in`;
-        userEmailDisplay.innerHTML = `Email: Please log in`;
-      }
+    // Populate Country Select Element
+    const countrySelect = document.getElementById('country');
+    countries.forEach(country => {
+      const option = document.createElement('option');
+      option.value = country;
+      option.textContent = country;
+      countrySelect.appendChild(option);
     });
-  
-    // Wallet Section
-    walletLink.addEventListener('click', async () => {
+
+    // Handle Home Icon Click
+    homeIcon.addEventListener('click', () => {
+      mainContent.innerHTML = `<h2>Home</h2><p>Home interface under development.</p>`;
+    });
+
+    // Handle Wallet Icon Click
+    walletIcon.addEventListener('click', async () => {
       const user = auth.currentUser;
       if (user) {
         const userRef = ref(database, 'users/' + user.uid + '/currency');
@@ -330,46 +287,129 @@
           const snapshot = await get(userRef);
           if (snapshot.exists()) {
             const pins = snapshot.val();
-            mainScreen.innerHTML = `<h2>Wallet</h2><p>Your balance is: ${pins} Pins.<BR> Withdrawal available from 10 jan.<BR> 1000PINS = 1$</p>`;
+            mainContent.innerHTML = `<h2>Wallet</h2><p>Your balance is: ${pins} Pins.<br>Withdrawal available from 21 Jan.<br>2000 PINS = 1$.</p>
+                                    <a href="redeem.html"><img src="redeemcode.png" alt="redeemcode" class="banner"></a>`;
           } else {
-            mainScreen.innerHTML = `<h2>Wallet</h2><p>No data available.</p>`;
+            mainContent.innerHTML = `<h2>Wallet</h2><p>No data available.</p>`;
           }
         } catch (error) {
           console.error("Error retrieving wallet data:", error);
-          mainScreen.innerHTML = `<h2>Wallet</h2><p>Error retrieving wallet data.</p>`;
+          mainContent.innerHTML = `<h2>Wallet</h2><p>Error retrieving wallet data.</p>`;
         }
-  
-        // Close the menu after opening the wallet
-        menu.classList.remove('open');
+      } else {
+        mainContent.innerHTML = `<h2>Wallet</h2><p>Please log in to view your wallet.</p>`;
       }
     });
-  
-    // Logout Functionality
-    logoutBtn.addEventListener('click', async () => {
-      try {
-        await signOut(auth);
-        window.location.href = "login.html";
-      } catch (error) {
-        console.error("Error logging out:", error);
+
+    // Handle Games Icon Click
+    gamesIcon.addEventListener('click', () => {
+      mainContent.innerHTML = `
+        <div class="games-heading">
+          <h2>Games</h2>
+        </div>
+        <ul>
+          <li><a href="mines.html"><img src="mines.png" class="game-image" alt="Mines Game"></a></li>
+          <li><a href="tictactoe.html"><img src="tictactoe.png" class="game-image" alt="Tic-Tac-Toe Game"></a></li>
+          <br>
+          <li><a href="offers.html"><img src="offerwall.jpg" class="game-image" alt="offerwalss"></a></li>
+        </ul>
+      `;
+    });
+
+    // Handle Profile Icon Click
+    profileIcon.addEventListener('click', () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = ref(database, 'users/' + user.uid);
+        get(userRef).then(snapshot => {
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            mainContent.innerHTML = `
+              <div class="profile-section">
+                <h2>Your Profile</h2>
+                <p>&nbsp;&nbsp;&nbsp;Name: ${userData.name || 'Not Set'}</p>
+                <p>&nbsp;&nbsp;&nbsp;Username: ${userData.username || 'Not Set'}</p>
+                <p>&nbsp;&nbsp;&nbsp;Email: ${user.email}</p>
+                &nbsp;&nbsp;&nbsp;<button id="edit-profile-btn" class="edit-profile-btn">Edit</button>
+              </div>
+            `;
+            document.getElementById('edit-profile-btn').addEventListener('click', openEditProfilePopup);
+          }
+        }).catch(error => {
+          console.error('Error fetching user data:', error);
+          alert('Failed to fetch profile data');
+        });
+      } else {
+        mainContent.innerHTML = `<h2>Your Profile</h2><p>Please log in to view your profile.</p>`;
       }
     });
-    
 
-    
-  </script>  
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9882692560922710"
-  crossorigin="anonymous"></script>
-<!-- banners -->
-<ins class="adsbygoogle"
-  style="display:block"
-  data-ad-client="ca-pub-9882692560922710"
-  data-ad-slot="9096794840"
-  data-ad-format="auto"
-  data-full-width-responsive="true"></ins>
+    // Open Edit Profile Popup
+    function openEditProfilePopup() {
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = ref(database, 'users/' + user.uid);
+        get(userRef).then(snapshot => {
+          if (snapshot.exists()) {
+            const userData = snapshot.val();
+            document.getElementById('name').value = userData.name || '';
+            document.getElementById('username').value = userData.username || '';
+            document.getElementById('country').value = userData.country || '';
+          }
+          editProfilePopup.style.display = 'flex';
+        }).catch(error => {
+          console.error('Error fetching user data:', error);
+          alert('Failed to fetch profile data');
+        });
+      }
+    }
 
-  
-<script>
-  (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
+    // Close Edit Profile Popup
+    window.closeEditProfilePopup = function closeEditProfilePopup() {
+      editProfilePopup.style.display = 'none';
+    }
+
+    // Save Profile Data
+    window.saveProfile = function saveProfile() {
+      const user = auth.currentUser;
+      if (user) {
+        const name = document.getElementById('name').value;
+        const username = document.getElementById('username').value;
+        const country = document.getElementById('country').value;
+
+        const userRef = ref(database, 'users/' + user.uid);
+        set(userRef, {
+          name: name,
+          username: username,
+          country: country
+        }).then(() => {
+          alert('Profile updated successfully');
+          closeEditProfilePopup();
+          window.location.reload();
+        }).catch((error) => {
+          console.error('Error saving profile:', error);
+          alert('Failed to save profile');
+        });
+      }
+    }
+
+    // Logout Function
+    window.logout = function logout() {
+  signOut(auth).then(() => {
+    alert('You have been logged out.');
+    window.location.href = 'login.html'; // Redirect to login.html after logout
+  }).catch((error) => {
+    console.error('Error logging out:', error);
+  });
+}
+
+
+    // Monitor Auth State Change
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        mainContent.innerHTML = `<h2>Welcome!</h2><p>Please log in to access all features.</p>`;
+      }
+    });
+  </script>
 </body>
 </html>

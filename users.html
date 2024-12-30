@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Users</title>
+  <style>
+    /* General Reset */
+    * {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(to right top, red, rgb(237, 104, 3));
+      color: white;
+      font-size: 1rem;
+    }
+
+    /* Header Section */
+    header {
+      text-align: center;
+      padding: 20px;
+      font-size: 2.5em;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-left: 30px;
+      margin-bottom: 10px;
+      margin-top: -20px;
+    }
+
+    .back-btn {
+      background-color: rgb(255, 255, 255);
+      color: rgb(237, 104, 3);
+      border: none;
+      padding: 10px 15px;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    /* Users List Section */
+    .user-list {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .user-item {
+      background-color: rgb(255, 255, 255);
+      color: rgb(237, 104, 3);
+      border: 2px solid rgb(237, 104, 3);
+      border-radius: 5px;
+      margin-bottom: 15px;
+      padding: 15px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: rgb(237, 104, 3);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <button class="back-btn" onclick="window.location.href='index.html'">Back</button>
+  </header>
+
+  <!-- User List Section -->
+  <div class="user-list" id="user-list">
+    <h2>Users List</h2>
+    <p>Loading users...</p>
+  </div>
+
+  <footer>
+    <p>&copy; 2024 Earn Bitz. All Rights Reserved.</p>
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDDlGiy8p4Bg1skGy-aOW-bk_FaSEgzrag",
+      authDomain: "earb-bitz.firebaseapp.com",
+      databaseURL: "https://earb-bitz-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "earb-bitz",
+      storageBucket: "earb-bitz.appspot.com",
+      messagingSenderId: "295167569247",
+      appId: "1:295167569247:web:ac3d4ada18f694908b9aea",
+      measurementId: "G-1F9ZKN1BH9"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+
+    // Get User List
+    const userListElement = document.getElementById('user-list');
+
+    async function fetchUsers() {
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          // Fetching the users data from Firebase
+          const snapshot = await get(ref(database, 'users'));
+          if (snapshot.exists()) {
+            const users = snapshot.val();
+            let userItems = '';
+            for (let userId in users) {
+              const userData = users[userId];
+              userItems += `
+                <div class="user-item">
+                  <h3>UID: ${userId}</h3>
+                  <p>Pins: ${userData.currency}</p>
+                </div>
+              `;
+            }
+            userListElement.innerHTML = userItems;
+          } else {
+            userListElement.innerHTML = '<p>No users found.</p>';
+          }
+        } catch (error) {
+          console.error("Error fetching users:", error);
+          userListElement.innerHTML = `<p>Error fetching users.</p>`;
+        }
+      } else {
+        userListElement.innerHTML = `<p>Please log in to view users.</p>`;
+      }
+    }
+
+    // Monitor Auth State
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchUsers();
+      } else {
+        userListElement.innerHTML = `<p>Please log in to view users.</p>`;
+      }
+    });
+  </script>
+
+</body>
+</html>
