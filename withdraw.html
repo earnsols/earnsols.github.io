@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdraw</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #181818;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 60px; /* Added padding-top to prevent header overlap */
+            margin-top: 25px;
+        }
+
+        /* Header Styles */
+.header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 5px 15px;  /* Reduced padding */
+    background-color: #202020;
+    color: #fff;
+    font-size: 16px;  /* Slightly smaller font size */
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+    height: 50px;  /* Header height remains at 50px */
+    box-sizing: border-box;
+}
+
+.header h1 {
+    margin-left: 10px;
+    font-size: 16px;  /* Adjusted title font size */
+    margin-right: 10px;
+}
+
+.balanceDisp {
+    font-size: 14px;  /* Reduced font size for balance */
+    font-weight: bold;
+    color: orangered;
+    margin-right: 15px; /* Reduced space between balance and right button */
+}
+
+.header-btn {
+    background-color: #fff;
+    color: orangered;
+    border: none;
+    padding: 5px 10px;  /* Reduced padding on buttons */
+    font-size: 14px;  /* Reduced font size on buttons */
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.header-btn:hover {
+    background-color: orangered;
+    color: #fff;
+}
+
+
+        .balanceDisp {
+            font-size: 18px;
+            font-weight: bold;
+            color: orangered; /* Ensure balance text color is orange */
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+             /* Adjusted to provide space from header */
+        }
+
+        .withdraw-option {
+            background-color: orangered;
+            color: #fff;
+            border: none;
+            padding: 15px 20px;
+            font-size: 18px;
+            margin: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .withdraw-option.selected {
+            background-color: #ffa500;
+        }
+
+        #tonAddress {
+            margin-top: 20px;
+            padding: 10px;
+            width: 80%;
+            font-size: 16px;
+            border: 2px solid orangered;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+        }
+
+        #withdrawButton {
+            background-color: orangered;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            margin-top: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .popup-content {
+            background-color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            color: #fff;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .popup-content h3 {
+            margin: 0 0 10px;
+            font-size: 24px;
+        }
+
+        .popup-content p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .popup-content button {
+            background-color: orangered;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .popup-content button:hover {
+            background-color: #ffa500;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button id="backButton" class="header-btn">Back</button>
+        <h1 class="heads">Withdraw</h1>
+        <div class="balanceDisp">
+            Balance: <span id="balance">Loading...</span> Pins
+        </div>
+        <button id="recordsButton" class="header-btn">Records</button>
+    </div>
+
+    <div class="button-row">
+        <button class="withdraw-option" data-value="10000">10,000 Pins</button>
+        <button class="withdraw-option" data-value="15000">15,000 Pins</button>
+    </div>
+    <div class="button-row">
+        <button class="withdraw-option" data-value="20000">20,000 Pins</button>
+        <button class="withdraw-option" data-value="25000">25,000 Pins</button>
+    </div>
+
+    <input type="text" id="tonAddress" placeholder="Enter TON Address">
+
+    <button id="withdrawButton">Withdraw</button>
+
+    <div id="popup" class="popup" style="display: none;">
+        <div class="popup-content">
+            <h3>Different TON Address</h3>
+            <p>
+                We use a different TON address for our transactions. See this video to know how to create a supported wallet in TON Keeper.
+            </p>
+            <button id="seeVideoButton">See Video</button>
+            <button id="closePopupButton">Back</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getDatabase, ref, get, update, push } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDDlGiy8p4Bg1skGy-aOW-bk_FaSEgzrag",
+            authDomain: "earb-bitz.firebaseapp.com",
+            databaseURL: "https://earb-bitz-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "earb-bitz",
+            storageBucket: "earb-bitz.appspot.com",
+            messagingSenderId: "295167569247",
+            appId: "1:295167569247:web:ac3d4ada18f694908b9aea",
+            measurementId: "G-1F9ZKN1BH9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth();
+
+        const balanceDisplay = document.getElementById('balance');
+        const withdrawOptions = document.querySelectorAll('.withdraw-option');
+        const withdrawButton = document.getElementById('withdrawButton');
+        const tonAddressInput = document.getElementById('tonAddress');
+        const popup = document.getElementById('popup');
+        const seeVideoButton = document.getElementById('seeVideoButton');
+        const closePopupButton = document.getElementById('closePopupButton');
+        const backButton = document.getElementById('backButton');
+        const recordsButton = document.getElementById('recordsButton');
+
+        let selectedAmount = null;
+        let balance = 0;
+
+        withdrawOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                withdrawOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedAmount = parseInt(option.getAttribute('data-value'), 10);
+            });
+        });
+
+        withdrawButton.addEventListener('click', () => {
+            const tonAddress = tonAddressInput.value.trim();
+            if (!tonAddress.startsWith('0QC')) {
+                popup.style.display = 'flex';
+                return;
+            }
+
+            if (selectedAmount === null) {
+                alert('Please select an amount.');
+                return;
+            }
+
+            if (selectedAmount > balance) {
+                alert('Not enough balance.');
+                return;
+            }
+
+            const orderId = Math.floor(100000 + Math.random() * 900000); // Numeric Order ID
+            balance -= selectedAmount;
+
+            const userId = auth.currentUser.uid;
+            const updates = {};
+            updates[`users/${userId}/currency`] = balance;
+            const orderData = {
+                amount: selectedAmount,
+                tonAddress,
+                status: 'Processing'
+            };
+
+            const orderRef = ref(db, `payments/${userId}`);
+            push(orderRef, orderData)  // Push order to Firebase
+                .then(() => {
+                    update(ref(db), updates);
+                    alert(`Withdraw request submitted. Order ID: ${orderId}`);
+                    balanceDisplay.textContent = balance;  // Update the balance after withdrawal
+                })
+                .catch(error => {
+                    console.error("Error pushing order data:", error);
+                    alert("Failed to submit withdraw request. Please try again.");
+                });
+        });
+
+        closePopupButton.addEventListener('click', () => {
+            popup.style.display = 'none';
+        });
+
+        seeVideoButton.addEventListener('click', () => {
+            window.open('tutorial.mp4', '_blank');
+        });
+
+        backButton.addEventListener('click', () => {
+            window.location.href = 'home.html';
+        });
+
+        recordsButton.addEventListener('click', () => {
+            window.location.href = 'records.html';
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const userId = user.uid;
+                const balanceRef = ref(db, `users/${userId}/currency`);
+
+                get(balanceRef)
+                    .then(snapshot => {
+                        if (snapshot.exists()) {
+                            balance = snapshot.val();
+                            balanceDisplay.textContent = balance;
+                        } else {
+                            balance = 0;
+                            balanceDisplay.textContent = '0';
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error fetching balance:", error);
+                        balanceDisplay.textContent = 'Error';
+                    });
+            } else {
+                alert("No user logged in. Redirecting to login page.");
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>

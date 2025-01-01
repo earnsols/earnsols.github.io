@@ -10,6 +10,10 @@
       color: white;
       font-size: 1rem;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background-size: cover;
+      background-attachment: fixed;
+      height: 100vh;
+      margin: 0;
     }
 
     .container {
@@ -24,6 +28,12 @@
       border-radius: 5px;
       padding: 15px;
       margin: 15px;
+      text-align: left;
+    }
+
+    .timestamp {
+      font-size: 0.9rem;
+      color: grey;
     }
 
     .back-btn {
@@ -47,7 +57,7 @@
     <h1>Your Notifications</h1>
     <button class="back-btn" onclick="window.location.href='home.html'">Back to Home</button>
 
-    <div id="notifications-display" class="notification">
+    <div id="notifications-display">
       Loading notifications...
     </div>
   </div>
@@ -75,16 +85,27 @@
     async function fetchNotifications() {
       const user = auth.currentUser;
       if (user) {
-        const userEmail = user.email.replace(/[^a-zA-Z0-9]/g, "_");
-        const notificationsRef = ref(database, 'notifications/' + userEmail);
+        const userUid = user.uid; 
+        const notificationsRef = ref(database, 'notifications/' + userUid);
 
         try {
           const snapshot = await get(notificationsRef);
           if (snapshot.exists()) {
             const notificationData = snapshot.val();
-            const notificationMessage = notificationData.message;
+            const notificationsArray = Object.keys(notificationData)
+              .map(key => notificationData[key])
+              .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // Sort by timestamp (most recent first)
 
-            document.getElementById("notifications-display").innerHTML = `<p>${notificationMessage}</p>`;
+            let notificationsHTML = '';
+            notificationsArray.slice(0, 10).forEach(notification => {
+              const notificationTimestamp = new Date(notification.timestamp).toLocaleString();
+              notificationsHTML += `
+                <div class="notification">
+                  <p><strong>${notification.message}</strong></p>
+                  <p class="timestamp">${notificationTimestamp}</p>
+                </div>`;
+            });
+            document.getElementById("notifications-display").innerHTML = notificationsHTML;
           } else {
             document.getElementById("notifications-display").innerHTML = `<p>No notifications found.</p>`;
           }

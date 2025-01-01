@@ -27,7 +27,6 @@
       padding: 20px;
       font-size: 2.5em;
       color: white;
-      position: relative;
     }
     .edit-profile-btn{
       background-color: rgb(237, 104, 3);
@@ -41,7 +40,7 @@
     #logout-button {
       position: absolute;
       top: 20px;
-      left: 20px;
+      left: 10px;
       background-color: white;
       color: rgb(237, 104, 3);
       border: none;
@@ -189,11 +188,33 @@
     .profile-section p {
       margin: 10px 0;
     }
-    .banner{
-      width: 480px;
-      height: 113px;
-      margin-top: 340px;
+    .wallet-info {
+      text-align: left;
+      margin-left: 50px;
+      margin-top: 20px;
+      margin-bottom: 40px;
     }
+
+    .wallet-info h2 {
+      margin-bottom: 20px;
+    }
+
+    .wallet-info p {
+      margin: 10px 0;
+    }
+    .banner{
+      width: 360px;
+      height: 60px;
+    }
+    .withdrawal-btn{
+      background-color: rgb(237, 104, 3);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
   </style>
 </head>
 <body>
@@ -202,7 +223,7 @@
   <header>
     Earn Bitz
     <button id="logout-button" onclick="logout()">Logout</button>
-    <a href="notifications.html"><img src="notifications.png" alt="Notifications" id="notifications-icon"></a>
+    <a href="notifications.html"><img src="notifications.png" alt="Notifications" id="notifications-icon" class="notify"></a>
   </header>
 
   <!-- Main Content Area -->
@@ -287,8 +308,11 @@
           const snapshot = await get(userRef);
           if (snapshot.exists()) {
             const pins = snapshot.val();
-            mainContent.innerHTML = `<h2>Wallet</h2><p>Your balance is: ${pins} Pins.<br>Withdrawal available from 21 Jan.<br>2000 PINS = 1$.</p>
-                                    <a href="redeem.html"><img src="redeemcode.png" alt="redeemcode" class="banner"></a>`;
+            mainContent.innerHTML = `<div class="wallet-info">
+                                     <h2>Wallet</h2><p>Your balance is: ${pins} Pins.<br>limited Withdrawal available Now <br>1000 PINS = 1.2$.</p>
+                                    <a href="withdraw.html"><button class="withdrawal-btn">withdraw</button></a></div>
+                                    <a href="redeem.html"><img src="redeemcode.png" alt="redeemcode" class="banner"></a>
+                                    `;
           } else {
             mainContent.innerHTML = `<h2>Wallet</h2><p>No data available.</p>`;
           }

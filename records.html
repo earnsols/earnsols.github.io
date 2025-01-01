@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Records</title>
+    <style>
+        /* Orange and black color theme */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000; /* Black background */
+            color: #f1f1f1;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #333; /* Dark gray */
+            color: #fff;
+        }
+        .header .back-btn {
+            background-color: #ff5722; /* Orange button */
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .header .back-btn:hover {
+            background-color: #e64a19; /* Darker orange on hover */
+        }
+        .main-content {
+            padding: 20px;
+            text-align: center;
+        }
+        h2 {
+            color: #ff5722;
+            margin-bottom: 20px;
+        }
+        #recordsContainer {
+            margin-top: 20px;
+        }
+        .record-item {
+            padding: 15px;
+            margin: 10px auto;
+            background-color: #1a1a1a; /* Slightly lighter black */
+            border: 1px solid #ff5722; /* Orange border */
+            border-radius: 8px;
+            max-width: 500px;
+            text-align: left;
+            color: #f1f1f1;
+        }
+        .record-item span {
+            display: block;
+            margin: 5px 0;
+        }
+        .no-records {
+            color: #ff5722;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header with back button -->
+    <div class="header">
+        <button class="back-btn" onclick="window.location.href='withdraw.html'">Back</button>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-content">
+        <h2>Payment Records</h2>
+        <div id="recordsContainer"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDDlGiy8p4Bg1skGy-aOW-bk_FaSEgzrag",
+            authDomain: "earb-bitz.firebaseapp.com",
+            databaseURL: "https://earb-bitz-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "earb-bitz",
+            storageBucket: "earb-bitz.appspot.com",
+            messagingSenderId: "295167569247",
+            appId: "1:295167569247:web:ac3d4ada18f694908b9aea",
+            measurementId: "G-1F9ZKN1BH9"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        const recordsContainer = document.getElementById("recordsContainer");
+
+        // Function to fetch and display payment records
+        function fetchPaymentRecords(userId) {
+            const paymentsRef = ref(database, `payments/${userId}`);
+            onValue(paymentsRef, (snapshot) => {
+                recordsContainer.innerHTML = ""; // Clear existing records
+                const records = snapshot.val();
+                if (records) {
+                    const recordEntries = Object.entries(records).reverse(); // Reverse for most recent first
+                    recordEntries.forEach(([orderId, record]) => {
+                        const recordItem = document.createElement("div");
+                        recordItem.classList.add("record-item");
+                        recordItem.innerHTML = `
+                            <span><strong>Order ID:</strong> ${orderId}</span>
+                            <span><strong>Amount:</strong> ${record.amount} Pins</span>
+                            <span><strong>Status:</strong> ${record.status}</span>
+                        `;
+                        recordsContainer.appendChild(recordItem);
+                    });
+                } else {
+                    recordsContainer.innerHTML = `<p class="no-records">No records found.</p>`;
+                }
+            }, (error) => {
+                console.error("Error fetching payment records:", error);
+                recordsContainer.innerHTML = `<p class="no-records">Failed to load records.</p>`;
+            });
+        }
+
+        // Monitor authentication state and load records for the logged-in user
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                fetchPaymentRecords(user.uid);
+            } else {
+                console.error("User not authenticated");
+                recordsContainer.innerHTML = `<p class="no-records">Please log in to view your payment records.</p>`;
+            }
+        });
+    </script>
+</body>
+</html>
