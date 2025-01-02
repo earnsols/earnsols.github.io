@@ -11,6 +11,7 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      
     }
 
     body {
@@ -203,8 +204,10 @@
       margin: 10px 0;
     }
     .banner{
-      width: 360px;
-      height: 60px;
+      min-width: 450px;
+      min-height: 120px;
+      max-width: 480px;
+      max-height: 190px;
     }
     .withdrawal-btn{
       background-color: rgb(237, 104, 3);
@@ -213,6 +216,15 @@
       padding: 10px 20px;
       cursor: pointer;
       border-radius: 5px;
+    }
+    .bannerimage{
+      width: 480;
+      height: 190px;
+    }
+    .ruler{
+      background-color: orangered;
+      height: 5px;
+      margin-bottom: 10px;
     }
 
   </style>
@@ -296,7 +308,9 @@
 
     // Handle Home Icon Click
     homeIcon.addEventListener('click', () => {
-      mainContent.innerHTML = `<h2>Home</h2><p>Home interface under development.</p>`;
+      mainContent.innerHTML = `<h2>Home</h2><p><hr class="ruler">
+                               <a href="daily-check-in.html"><img src="checkinimage.png" alt="checkin" class="bannerimage"></a>
+                               <br></p>`;
     });
 
     // Handle Wallet Icon Click

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #000; /* Black background */
+      color: white; /* White text */
+    }
+
+    header {
+      background-color: #ff4500; /* Orange-Red Header */
+      color: white;
+      text-align: center;
+      padding: 10px;
+    }
+
+    main {
+      padding: 20px;
+    }
+
+    #daily-checkin {
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    #daily-checkin h2 {
+      margin-bottom: 10px;
+      color: #ff4500; /* Orange-Red Heading */
+    }
+
+    .checkin-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 80px);
+      grid-gap: 15px;
+      justify-content: center;
+    }
+
+    .checkin-day {
+      position: relative;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .checkin-day img {
+      width: 80px;
+      height: 80px;
+      cursor: pointer;
+      border: 2px solid #ff4500; /* Orange-Red border */
+      border-radius: 8px;
+    }
+
+    .checkin-day.completed img {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .checkin-day.completed::after {
+      content: '✔';  /* Unicode checkmark character */
+      font-size: 60px;  /* Adjust size */
+      color: #00ff00;  /* Green color */
+      position: absolute;
+      top: 15px;
+      left: 25px;
+    }
+
+    .checkin-day.disabled img {
+      cursor: not-allowed;
+      opacity: 0.3;
+    }
+    .btn {
+      position: absolute;
+      top: 20px;
+      left: 10px;
+      background-color: white;
+      color: rgb(237, 104, 3);
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .btn:hover {
+      background-color: rgb(237, 104, 3);
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Welcome Home</h1>
+    <a href="home.html"><button class="btn">Back</button></a>
+  </header>
+  <main>
+    <!-- Existing content -->
+    <!-- Daily Check-in Section -->
+    <section id="daily-checkin">
+      <h2>Daily Check-in</h2>
+      <div class="checkin-grid">
+        <div class="checkin-day" data-day="1"><img src="coin.png" alt="Day 1"></div>
+        <div class="checkin-day" data-day="2"><img src="coin.png" alt="Day 2"></div>
+        <div class="checkin-day" data-day="3"><img src="coin.png" alt="Day 3"></div>
+        <div class="checkin-day" data-day="4"><img src="coin.png" alt="Day 4"></div>
+        <div class="checkin-day" data-day="5"><img src="coin.png" alt="Day 5"></div>
+        <div class="checkin-day" data-day="6"><img src="coin.png" alt="Day 6"></div>
+        <div class="checkin-day" data-day="7"><img src="coin.png" alt="Day 7"></div>
+        <div class="checkin-day" data-day="8"><img src="coin.png" alt="Day 8"></div>
+        <div class="checkin-day" data-day="9"><img src="coin.png" alt="Day 9"></div>
+        <div class="checkin-day" data-day="10"><img src="coin.png" alt="Day 10"></div>
+      </div>
+    </section>
+    <!-- End of Daily Check-in Section -->
+
+    <!-- Existing content -->
+  </main>
+
+  <script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDDlGiy8p4Bg1skGy-aOW-bk_FaSEgzrag",
+      authDomain: "earb-bitz.firebaseapp.com",
+      databaseURL: "https://earb-bitz-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "earb-bitz",
+      storageBucket: "earb-bitz.appspot.com",
+      messagingSenderId: "295167569247",
+      appId: "1:295167569247:web:ac3d4ada18f694908b9aea",
+      measurementId: "G-1F9ZKN1BH9"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const rewards = [300, 500, 700, 900, 1100, 1300, 1500, 1700, 1900, 2100];
+      const checkinDays = document.querySelectorAll('.checkin-day');
+
+      auth.onAuthStateChanged(user => {
+        if (user) {
+          const userId = user.uid;
+          const today = new Date().getDate();
+
+          // Fetch already checked-in days
+          db.ref(`users/${userId}/dailyCheckin`).once('value').then(snapshot => {
+            const claimedDays = snapshot.val() || {};
+
+            checkinDays.forEach(dayElement => {
+              const day = parseInt(dayElement.getAttribute('data-day'));
+
+              if (claimedDays[day]) {
+                // Mark already claimed
+                markDayAsClaimed(dayElement);
+              } else if (day > today) {
+                // Disable future days
+                dayElement.classList.add('disabled');
+              }
+
+              // Add click handler for claimable days
+              dayElement.addEventListener('click', () => {
+                if (!claimedDays[day] && day <= today) {
+                  const reward = rewards[day - 1];
+                  claimedDays[day] = true;
+
+                  // Update pins in Firebase
+                  db.ref(`users/${userId}/currency`).transaction(currentPins => {
+                    return (currentPins || 0) + reward;
+                  });
+
+                  // Update claimed days in Firebase
+                  db.ref(`users/${userId}/dailyCheckin`).set(claimedDays);
+
+                  // Mark the day as claimed visually
+                  markDayAsClaimed(dayElement);
+                }
+              });
+            });
+          });
+
+          function markDayAsClaimed(dayElement) {
+            dayElement.classList.add('completed');
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
