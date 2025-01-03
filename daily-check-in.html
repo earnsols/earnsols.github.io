@@ -141,7 +141,7 @@
     const db = firebase.database();
 
     document.addEventListener('DOMContentLoaded', () => {
-      const rewards = [300, 500, 700, 900, 1100, 1300, 1500, 1700, 1900, 2100];
+      const rewards = [0.3, 0.500, 0.700, 0.900, 1.100, 1.300, 1.500, 1.700, 1.900, 2.100];
       const checkinDays = document.querySelectorAll('.checkin-day');
 
       auth.onAuthStateChanged(user => {
