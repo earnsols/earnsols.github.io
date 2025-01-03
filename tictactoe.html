@@ -224,7 +224,7 @@
       if (winner) {
         statusText.textContent = `Player ${winner} wins!`;
         if (winner === 'X') {
-          totalPins += 5; // Player earns 5 pins for winning
+          totalPins += 0.1; // Player earns 5 pins for winning
         }
         currencyText.textContent = `Total PINS: ${totalPins}`;
         disableBoard();
