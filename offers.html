@@ -97,22 +97,22 @@
   <div class="offer-list">
     <div class="offer-item">
       <h3>Offer 1</h3>
-      <p>Complete the download to earn 20 Pins!</p>
+      <p>Complete the download to earn .20 Pins!</p>
       <button class="start-btn" id="offer1">Start Offer</button>
     </div>
     <div class="offer-item">
       <h3>Offer 2</h3>
-      <p>Complete the task to earn 20 Pins!</p>
+      <p>Complete the task to earn .20 Pins!</p>
       <button class="start-btn" id="offer2">Start Offer</button>
     </div>
     <div class="offer-item">
       <h3>Offer 3</h3>
-      <p>Complete the task to earn 20 Pins!</p>
+      <p>Complete the task to earn .20 Pins!</p>
       <button class="start-btn" id="offer3">Start Offer</button>
     </div>
     <div class="offer-item">
       <h3>Survey</h3>
-      <p>Complete the survey to earn 20 Pins!</p>
+      <p>Complete the survey to earn .20 Pins!</p>
       <button class="start-btn" id="survey">Start Offer</button>
     </div>
   </div>
@@ -194,7 +194,7 @@
               let currentBalance = snapshot.val();
 
               // Add 20 pins to the current balance
-              const updatedBalance = currentBalance + 20;
+              const updatedBalance = currentBalance + 0.20;
 
               // Update the new balance in Firebase
               await set(userRef, updatedBalance);
