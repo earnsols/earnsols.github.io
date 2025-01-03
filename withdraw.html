@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Withdraw Options</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: orangered;
+            color: black;
+            text-align: center;
+        }
+
+        header {
+            background-color: black;
+            padding: 10px 0;
+            color: orangered;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            color: orangered;
+            font-size: 18px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 20px 0;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .content img {
+            width: 200px;
+            height: auto;
+            cursor: pointer;
+            border: 2px solid black;
+            border-radius: 10px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .content img:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <button class="back-button" onclick="window.location.href='home.html';">← Back to Home</button>
+    </header>
+
+    <h1>Choose a Withdrawal Option</h1>
+
+    <div class="content">
+        <a href="withdraw-gplay.html">
+            <img src="gplay.png" alt="GPlay Withdrawal">
+        </a>
+        <a href="withdraw-ton.html">
+            <img src="tonnet.png" alt="TON Withdrawal">
+        </a>
+    </div>
+</body>
+</html>
