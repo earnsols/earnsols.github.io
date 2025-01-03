@@ -236,7 +236,7 @@ footer {
   </header>
   <main>
     <div id="currency">Total PINS: 0</div>
-    <div id="status">You need 2 pins to play.</div>
+    <div id="status">You need 0.05 pins to play.</div>
     <div id="board" class="board"></div>
     <div class="multiplier">Current Multiplier: 1x</div>
     <div>
@@ -249,7 +249,7 @@ footer {
     <div>
       <label for="betSlider" style="color: white;">Select Bet Amount (0.05-0.5):</label>
       <input type="range" id="betSlider" min="0.05" max="0.5" value="0.05" />
-      <span id="betAmountDisplay" style="color: white;">2</span> PINS
+      <span id="betAmountDisplay" style="color: white;">0.05</span> PINS
     </div>
 
     <div id="errorMessage" class="error" style="display: none;">Bet amount cannot exceed available PINS!</div>
@@ -354,7 +354,7 @@ footer {
       let openedCells = 0;
       let board = [];
       let totalMines = 1; // Default to 1 mine
-      let betAmount = 2; // Default bet amount
+      let betAmount = 0.05; // Default bet amount
   
       console.log("Initial pins value:", pins);  // Log to check the initial pin value
   
